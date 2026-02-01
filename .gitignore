@@ -1,0 +1,32 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# 环境变量
+.env
+.env.local
+
+# 本地启动脚本
+*.bat
+
+# 工作日志
+work_logs/
+
+# 测试文件
+test-api.html
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 临时文件
+*.tmp
+*.temp

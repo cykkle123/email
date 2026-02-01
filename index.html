@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="免费临时邮箱服务，支持 Maildrop 和 Mail.gw，无需注册，即刻使用">
+    <meta name="keywords" content="临时邮箱,一次性邮箱,临时邮件,disposable email">
+    <meta name="theme-color" content="#667eea">
+    <title>📧 临时邮箱客户端 - 快速安全的临时邮箱服务</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📧 临时邮箱客户端</h1>
+            <p class="subtitle">快速获取临时邮箱，安全接收验证邮件</p>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">🚀</span>
+                    <span class="stat-text">即时生成</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔒</span>
+                    <span class="stat-text">安全可靠</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🆓</span>
+                    <span class="stat-text">完全免费</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 服务商选择 -->
+        <section class="provider-selector" aria-label="选择邮箱服务商">
+            <button class="provider-btn active" data-provider="maildrop" aria-label="选择 Maildrop 服务">
+                <span class="provider-icon">📮</span>
+                <span class="provider-name">Maildrop</span>
+                <span class="provider-badge">自定义</span>
+            </button>
+            <button class="provider-btn" data-provider="mailgw" aria-label="选择 Mail.gw 服务">
+                <span class="provider-icon">✉️</span>
+                <span class="provider-name">Mail.gw</span>
+                <span class="provider-badge">随机</span>
+            </button>
+        </section>
+
+        <!-- 邮箱生成区域 -->
+        <section class="email-section" aria-label="邮箱生成">
+            <!-- Maildrop 输入 -->
+            <div class="email-input-group" id="maildropInput">
+                <input 
+                    type="text" 
+                    id="mailboxName" 
+                    placeholder="输入邮箱名（字母、数字、-、_）" 
+                    aria-label="输入邮箱名称"
+                    autocomplete="off"
+                />
+                <span class="domain">@maildrop.cc</span>
+                <button id="randomMaildrop" class="btn-secondary" aria-label="随机生成邮箱名" title="随机生成">
+                    🎲
+                </button>
+                <button id="useMaildrop" class="btn-primary" aria-label="使用此邮箱">
+                    ✓ 使用此邮箱
+                </button>
+            </div>
+
+            <!-- Mail.gw 输入 -->
+            <div class="email-input-group hidden" id="mailgwInput">
+                <button id="generateMailgw" class="btn-primary" aria-label="生成随机邮箱">
+                    🎲 生成随机邮箱
+                </button>
+            </div>
+
+            <div class="current-email hidden" id="currentEmail" role="status" aria-live="polite">
+                <label>📧 当前邮箱：</label>
+                <span id="emailDisplay"></span>
+                <button id="copyEmail" class="btn-copy" aria-label="复制邮箱地址">
+                    📋 复制
+                </button>
+            </div>
+        </section>
+
+        <!-- 收件箱区域 -->
+        <section class="inbox-section hidden" id="inboxSection" aria-label="收件箱">
+            <div class="inbox-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h2>📬 收件箱</h2>
+                    <span class="auto-refresh-indicator" title="每10秒自动刷新">自动刷新</span>
+                </div>
+                <button id="refreshBtn" class="btn-refresh" aria-label="刷新收件箱">
+                    🔄 刷新
+                </button>
+            </div>
+
+            <div class="email-list" id="emailList" role="list">
+                <div class="loading hidden" id="loading" role="status" aria-live="polite">
+                    <div class="loading-spinner"></div>
+                    <p>加载中</p>
+                </div>
+                
+                <!-- 骨架屏 -->
+                <div class="skeleton-list hidden" id="skeletonList">
+                    <div class="skeleton-item">
+                        <div class="skeleton-line skeleton-title"></div>
+                        <div class="skeleton-line skeleton-text"></div>
+                        <div class="skeleton-line skeleton-text short"></div>
+                    </div>
+                    <div class="skeleton-item">
+                        <div class="skeleton-line skeleton-title"></div>
+                        <div class="skeleton-line skeleton-text"></div>
+                        <div class="skeleton-line skeleton-text short"></div>
+                    </div>
+                    <div class="skeleton-item">
+                        <div class="skeleton-line skeleton-title"></div>
+                        <div class="skeleton-line skeleton-text"></div>
+                        <div class="skeleton-line skeleton-text short"></div>
+                    </div>
+                </div>
+                
+                <div class="empty-state" id="emptyState" role="status">
+                    <div class="empty-icon">📭</div>
+                    <div class="empty-title">暂无邮件</div>
+                    <div class="empty-desc">新邮件会自动显示在这里</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 邮件详情 -->
+        <article class="email-detail hidden" id="emailDetail" aria-label="邮件详情">
+            <div class="detail-header">
+                <button id="backBtn" class="btn-back" aria-label="返回收件箱">
+                    ← 返回
+                </button>
+                <h3 id="detailSubject"></h3>
+            </div>
+            <div class="detail-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">👤</span>
+                    <strong>发件人：</strong>
+                    <span id="detailFrom"></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">🕐</span>
+                    <strong>时间：</strong>
+                    <span id="detailDate"></span>
+                </div>
+            </div>
+            <div class="detail-content">
+                <div class="view-toggle" role="tablist" aria-label="邮件视图切换">
+                    <button class="view-btn active" data-view="html" role="tab" aria-selected="true">
+                        🌐 HTML
+                    </button>
+                    <button class="view-btn" data-view="text" role="tab" aria-selected="false">
+                        📄 纯文本
+                    </button>
+                </div>
+                <div id="detailBody" role="tabpanel"></div>
+            </div>
+        </article>
+        
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>💡 提示：临时邮箱仅用于测试和验证，请勿接收敏感信息</p>
+            <p class="footer-links">
+                <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+                <span>·</span>
+                <a href="#" id="aboutLink">关于</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
